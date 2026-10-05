@@ -57,6 +57,7 @@ export class WithdrawalService {
     AOA: 500000n, // 5,000.00 AOA
     USD: 1000n,   // 10.00 USD
     EUR: 1000n,   // 10.00 EUR
+    BRL: 5000n,   // 50.00 BRL
   };
 
   constructor(client: SupabaseClient) {

@@ -79,10 +79,43 @@ export default function CheckoutPage({
   const [socialProofIndex, setSocialProofIndex] = useState(0);
   const [showSocialToast, setShowSocialToast] = useState(true);
 
+  // Multi-currency display
+  const [displayCurrency, setDisplayCurrency] = useState<'AOA' | 'USD' | 'EUR' | 'BRL'>('AOA');
+  const [convertedDisplayTotal, setConvertedDisplayTotal] = useState<string | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingQuote, setIsUpdatingQuote] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleCurrencyChange = async (targetCurr: 'AOA' | 'USD' | 'EUR' | 'BRL') => {
+    setDisplayCurrency(targetCurr);
+    if (!quote || targetCurr === quote.currency) {
+      setConvertedDisplayTotal(null);
+      return;
+    }
+
+    try {
+      const majorNum = parseFloat(quote.totalAmount);
+      const minor = Math.round(majorNum * 100);
+      const res = await fetch('/api/v1/fx/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amountMinor: minor,
+          from: quote.currency,
+          to: targetCurr,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setConvertedDisplayTotal(`~ ${data.currencySymbol} ${data.convertedAmount}`);
+      }
+    } catch {
+      // non-blocking
+    }
+  };
 
   const loadQuoteAndCustomizer = useCallback(async () => {
     try {
@@ -332,11 +365,31 @@ export default function CheckoutPage({
 
         {/* 3. Financial Summary */}
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h2 className="font-semibold text-base">Resumo Financeiro da Cotação</h2>
-            {isUpdatingQuote && (
-              <span className="text-xs text-blue-600 animate-pulse font-medium">Recalculando...</span>
-            )}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 gap-2">
+            <div className="flex items-center space-x-2">
+              <h2 className="font-semibold text-base">Resumo Financeiro da Cotação</h2>
+              {isUpdatingQuote && (
+                <span className="text-xs text-blue-600 animate-pulse font-medium">Recalculando...</span>
+              )}
+            </div>
+
+            {/* Currency switcher */}
+            <div className="flex items-center space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs">
+              {(['AOA', 'USD', 'EUR', 'BRL'] as const).map((curr) => (
+                <button
+                  key={curr}
+                  type="button"
+                  onClick={() => handleCurrencyChange(curr)}
+                  className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all ${
+                    displayCurrency === curr
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {curr}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2 text-sm">
@@ -359,11 +412,18 @@ export default function CheckoutPage({
               </div>
             )}
 
-            <div className="flex justify-between text-base font-bold pt-3 border-t border-slate-200 dark:border-slate-800">
+            <div className="flex justify-between items-center text-base font-bold pt-3 border-t border-slate-200 dark:border-slate-800">
               <span>Total Oficial a Pagar</span>
-              <span className="text-lg" style={{ color: primaryColor }}>
-                {quote.totalAmount} {quote.currency}
-              </span>
+              <div className="text-right">
+                <span className="text-lg block" style={{ color: primaryColor }}>
+                  {quote.totalAmount} {quote.currency}
+                </span>
+                {convertedDisplayTotal && (
+                  <span className="text-xs font-semibold text-slate-500 block">
+                    ({convertedDisplayTotal})
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

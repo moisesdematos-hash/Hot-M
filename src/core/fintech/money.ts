@@ -7,7 +7,7 @@
  * - Division operations use banker's rounding or explicit remainder distribution.
  */
 
-export type CurrencyCode = 'AOA' | 'USD' | 'EUR';
+export type CurrencyCode = 'AOA' | 'USD' | 'EUR' | 'BRL';
 
 export interface MoneyValue {
   readonly amount: bigint; // Minor units (e.g. 1000 = 10.00)

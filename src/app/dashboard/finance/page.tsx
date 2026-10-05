@@ -24,7 +24,7 @@ interface StatementItem {
 }
 
 export default function FinanceWalletPage() {
-  const [currency, setCurrency] = useState<'AOA' | 'USD' | 'EUR'>('AOA');
+  const [currency, setCurrency] = useState<'AOA' | 'USD' | 'EUR' | 'BRL'>('AOA');
   const [balance, setBalance] = useState<BalanceData | null>(null);
   const [statement, setStatement] = useState<StatementItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -76,13 +76,21 @@ export default function FinanceWalletPage() {
         <div className="flex items-center gap-3">
           <select
             value={currency}
-            onChange={(e) => setCurrency(e.target.value as 'AOA' | 'USD' | 'EUR')}
+            onChange={(e) => setCurrency(e.target.value as 'AOA' | 'USD' | 'EUR' | 'BRL')}
             className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             <option value="AOA">AOA (Kwanza)</option>
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
+            <option value="BRL">BRL (Real R$)</option>
           </select>
+
+          <Link
+            href="/dashboard/finance/exchange-rates"
+            className="inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm"
+          >
+            💱 Câmbio (FX)
+          </Link>
 
           <Link
             href="/dashboard/finance/withdraw"
