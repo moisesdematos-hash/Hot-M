@@ -160,8 +160,8 @@ export default function BuyerLibraryPage() {
                   </button>
                 ) : (
                   <Link
-                    href={`/courses/${item.product.id}`}
-                    className="w-full inline-flex items-center justify-center rounded-lg bg-slate-900 dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 dark:hover:bg-slate-700 transition"
+                    href={`/library/courses/${item.product.id}`}
+                    className="w-full inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
                   >
                     ▶ Acessar Aulas
                   </Link>
