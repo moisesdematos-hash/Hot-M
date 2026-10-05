@@ -293,6 +293,42 @@ export class WebhookEngine {
       affiliateAccount = await this.getOrCreateAccount(order.affiliate_id, 'AFFILIATE_BALANCE', currency);
     }
 
+    // Check for Co-producers (Phase 13)
+    const productId = order.order_items?.[0]?.product_id;
+    const partnerEntries: LedgerEntryDraft[] = [];
+    let primaryCreatorAmount = creatorEarningsMoney.amount;
+
+    if (productId) {
+      const sharesQuery = this.client.from('revenue_shares');
+      if (sharesQuery && typeof sharesQuery.select === 'function') {
+        const { data: shares } = await sharesQuery
+          .select('partner_id, percentage')
+          .eq('product_id', productId);
+
+        if (shares && shares.length > 0) {
+          let totalPartnersMinor = 0n;
+          for (const s of shares) {
+            const partMinor = (creatorEarningsMoney.amount * BigInt(s.percentage)) / 100n;
+            if (partMinor > 0n) {
+              totalPartnersMinor += partMinor;
+              const partnerAcc = await this.getOrCreateAccount(s.partner_id, 'CREATOR_BALANCE', currency);
+              partnerEntries.push({
+                accountId: partnerAcc.id,
+                accountType: 'CREATOR_BALANCE',
+                direction: 'CREDIT',
+                amount: partMinor,
+                currency,
+              });
+            }
+          }
+          primaryCreatorAmount =
+            creatorEarningsMoney.amount > totalPartnersMinor
+              ? creatorEarningsMoney.amount - totalPartnersMinor
+              : 0n;
+        }
+      }
+    }
+
     const entries: LedgerEntryDraft[] = [
       {
         accountId: clearingAccount.id,
@@ -312,9 +348,10 @@ export class WebhookEngine {
         accountId: creatorAccount.id,
         accountType: 'CREATOR_BALANCE',
         direction: 'CREDIT',
-        amount: creatorEarningsMoney.amount,
+        amount: primaryCreatorAmount,
         currency,
       },
+      ...partnerEntries,
     ];
 
     if (affiliateAccount && affiliateMoney.isPositive()) {
