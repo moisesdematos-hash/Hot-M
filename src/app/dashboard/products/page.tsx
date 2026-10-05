@@ -107,6 +107,12 @@ export default function CreatorProductsPage() {
                 >
                   ⚡ Funil & Bumps
                 </Link>
+                <Link
+                  href={`/dashboard/products/${p.id}/checkout-customizer`}
+                  className="text-purple-600 dark:text-purple-400 hover:text-purple-700 transition"
+                >
+                  🎨 Checkout
+                </Link>
                 {p.product_type === 'COURSE' && (
                   <Link
                     href={`/dashboard/products/${p.id}/course`}
