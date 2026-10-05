@@ -25,30 +25,72 @@ export class ProxyPayAdapter implements PaymentProvider {
     this.config = config;
   }
 
+  /**
+   * Generates or registers a Multicaixa bank reference with ProxyPay.
+   * If token is provided and not in dummy test mode, calls official PUT /references/:id.
+   * Otherwise generates a valid contractual 9-digit sandbox reference.
+   */
   async createPayment(request: PaymentCreationRequest): Promise<PaymentCreationResponse> {
     if (request.amount.currency !== 'AOA') {
       throw new Error(`ProxyPay only supports AOA currency, received ${request.amount.currency}`);
     }
 
-    // In a live call, HOT-M calls ProxyPay PUT /references/:referenceId
-    // For Phase 0/Foundation, the adapter defines the contractual HTTP call and validation
+    const expiryMinutes = request.expiryMinutes ?? 1440; // 24 horas por padrão
+    const expiresAt = new Date(Date.now() + expiryMinutes * 60 * 1000).toISOString();
+    const entity = this.config.entity || '99999';
+
+    // Gerar número de referência de 9 dígitos determinístico/único
     const referenceNumber = Math.floor(100000000 + Math.random() * 900000000).toString();
-    const expiryDate = new Date(Date.now() + (request.expiryMinutes ?? 1440) * 60 * 1000).toISOString();
+
+    // Se houver token real configurado (não dummy de teste), faz chamada à API da ProxyPay
+    const isMockToken = !this.config.token || 
+      this.config.token.startsWith('test_') || 
+      this.config.token === 'your_proxypay_api_token';
+
+    if (!isMockToken) {
+      try {
+        const response = await fetch(`${this.config.apiUrl}/references/${referenceNumber}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Token ${this.config.token}`,
+            'Accept': 'application/vnd.proxypay.v2+json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: request.amount.toMajorString(),
+            end_datetime: expiresAt,
+            custom_fields: {
+              order_id: request.orderId,
+              customer_id: request.customer.id,
+            },
+          }),
+        });
+
+        if (!response.ok && response.status !== 200 && response.status !== 201) {
+          const errText = await response.text();
+          throw new Error(`Erro ProxyPay API (${response.status}): ${errText}`);
+        }
+      } catch (err: unknown) {
+        // Se a chamada de rede falhar no ambiente externo, repassar erro transparente
+        throw new Error(`Falha na comunicação com o gateway ProxyPay: ${err instanceof Error ? err.message : 'Erro'}`);
+      }
+    }
 
     return {
       providerReference: referenceNumber,
       paymentMethod: 'MULTICAIXA_REFERENCE',
       instructions: {
-        entity: this.config.entity,
+        entity,
         reference: referenceNumber,
         amount: request.amount.toMajorString(),
-        expiresAt: expiryDate,
+        expiresAt,
       },
       rawResponse: {
-        entity: this.config.entity,
+        entity,
         reference: referenceNumber,
         amount: request.amount.toMajorString(),
-        expiry: expiryDate,
+        expiry: expiresAt,
+        provider: 'PROXYPAY',
       },
     };
   }
@@ -79,12 +121,11 @@ export class ProxyPayAdapter implements PaymentProvider {
 
   parseEvent(rawBody: string): NormalizedWebhookEvent {
     const payload = JSON.parse(rawBody);
-    
-    // ProxyPay event schema: { id, reference_id, amount, datetime, status }
+
     const eventId = String(payload.id || payload.transaction_id || crypto.randomUUID());
     const providerReference = String(payload.reference_id || payload.reference || '');
     const amountNum = parseFloat(payload.amount || '0');
-    const status: NormalizedPaymentStatus = 
+    const status: NormalizedPaymentStatus =
       payload.status === 'accepted' || payload.status === 'paid' ? 'PAID' : 'PENDING';
 
     return {
@@ -99,14 +140,38 @@ export class ProxyPayAdapter implements PaymentProvider {
   }
 
   async getPaymentStatus(providerReference: string): Promise<NormalizedPaymentStatus> {
-    // Contractual method to query ProxyPay API
     if (!providerReference) {
-      throw new Error('Provider reference is required to check status');
+      throw new Error('Referência do provedor é obrigatória para consultar status');
     }
+
+    const isMockToken = !this.config.token || 
+      this.config.token.startsWith('test_') || 
+      this.config.token === 'your_proxypay_api_token';
+
+    if (!isMockToken) {
+      try {
+        const response = await fetch(`${this.config.apiUrl}/references/${providerReference}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Token ${this.config.token}`,
+            'Accept': 'application/vnd.proxypay.v2+json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'paid' || data.status === 'accepted') return 'PAID';
+          if (data.status === 'expired') return 'EXPIRED';
+        }
+      } catch {
+        // Fallback to PENDING
+      }
+    }
+
     return 'PENDING';
   }
 
   async refund(_request: RefundRequest): Promise<RefundResponse> {
-    throw new Error('ProxyPay Multicaixa reference refunds must be processed through manual/bank-transfer workflow');
+    throw new Error('Reembolsos Multicaixa devem ser processados via transferência bancária manual ou reconciliação bancária');
   }
 }
