@@ -94,12 +94,18 @@ export default function CreatorProductsPage() {
               </div>
               <h3 className="font-bold text-lg leading-tight line-clamp-1">{p.title}</h3>
               <p className="text-xs text-slate-500 font-mono">slug: {p.slug}</p>
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold">
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold gap-2 flex-wrap">
                 <Link
                   href={`/dashboard/products/${p.id}/coproduction`}
                   className="text-slate-600 dark:text-slate-400 hover:text-blue-600 transition"
                 >
                   🤝 Coprodução
+                </Link>
+                <Link
+                  href={`/dashboard/products/${p.id}/funnel`}
+                  className="text-amber-600 dark:text-amber-400 hover:text-amber-700 transition"
+                >
+                  ⚡ Funil & Bumps
                 </Link>
                 {p.product_type === 'COURSE' && (
                   <Link

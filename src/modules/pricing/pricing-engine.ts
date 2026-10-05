@@ -14,6 +14,7 @@ export interface PricingQuote {
   discountAmountMinor: bigint;
   orderBumpsAmountMinor: bigint;
   totalAmountMinor: bigint;
+  productId?: string;
   appliedCoupon: {
     code: string;
     discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
@@ -24,6 +25,7 @@ export interface PricingQuote {
     amount: string;
     amountMinor: bigint;
   }>;
+  orderBumpOfferIds?: string[];
   expiresAt: string;
 }
 
@@ -138,6 +140,7 @@ export class PricingEngine {
     return {
       quoteId: quoteRecord.id,
       offerId,
+      productId: basePriceRecord.product_id,
       currency,
       baseAmount: baseMoney.toMajorString(),
       discountAmount: discountMoney.toMajorString(),
@@ -149,6 +152,7 @@ export class PricingEngine {
       totalAmountMinor: finalTotal.amount,
       appliedCoupon: appliedCouponData,
       orderBumps: orderBumpsDetails,
+      orderBumpOfferIds: orderBumpOfferIds || [],
       expiresAt,
     };
   }
@@ -180,9 +184,31 @@ export class PricingEngine {
     const bumpsMoney = Money.fromMinor(record.order_bumps_amount_minor, currency);
     const totalMoney = Money.fromMinor(record.total_amount_minor, currency);
 
+    const { data: offerData } = await this.client
+      .from('offers')
+      .select('product_id')
+      .eq('id', record.offer_id)
+      .maybeSingle();
+
+    const orderBumpsDetails: PricingQuote['orderBumps'] = [];
+    if (record.order_bump_offer_ids && record.order_bump_offer_ids.length > 0) {
+      for (const bumpId of record.order_bump_offer_ids) {
+        const bumpPriceRecord = await this.getOfferPrice(bumpId, currency);
+        if (bumpPriceRecord) {
+          const bumpMoney = Money.fromMinor(bumpPriceRecord.amount_minor, currency);
+          orderBumpsDetails.push({
+            offerId: bumpId,
+            amount: bumpMoney.toMajorString(),
+            amountMinor: bumpMoney.amount,
+          });
+        }
+      }
+    }
+
     return {
       quoteId: record.id,
       offerId: record.offer_id,
+      productId: offerData?.product_id,
       currency,
       baseAmount: baseMoney.toMajorString(),
       discountAmount: discountMoney.toMajorString(),
@@ -199,7 +225,8 @@ export class PricingEngine {
             discountValue: Number(record.coupons.discount_value),
           }
         : null,
-      orderBumps: [],
+      orderBumps: orderBumpsDetails,
+      orderBumpOfferIds: record.order_bump_offer_ids || [],
       expiresAt: record.expires_at,
     };
   }

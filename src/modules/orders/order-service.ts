@@ -128,6 +128,34 @@ export class OrderService {
       },
     ];
 
+    if (quote.orderBumps && quote.orderBumps.length > 0) {
+      for (const bump of quote.orderBumps) {
+        const { data: bumpOffer } = await this.client
+          .from('offers')
+          .select('id, product_id')
+          .eq('id', bump.offerId)
+          .maybeSingle();
+
+        const { data: bumpPrice } = await this.client
+          .from('prices')
+          .select('id')
+          .eq('offer_id', bump.offerId)
+          .eq('currency', quote.currency)
+          .maybeSingle();
+
+        if (bumpOffer) {
+          itemsToInsert.push({
+            order_id: orderRecord.id,
+            product_id: bumpOffer.product_id,
+            offer_id: bump.offerId,
+            price_id: bumpPrice?.id || mainPriceRecord.id,
+            unit_amount_minor: bump.amountMinor,
+            quantity: 1,
+          });
+        }
+      }
+    }
+
     const { data: itemsRecords, error: itemsError } = await this.client
       .from('order_items')
       .insert(itemsToInsert)
