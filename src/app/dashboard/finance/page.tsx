@@ -100,6 +100,13 @@ export default function FinanceWalletPage() {
           </Link>
 
           <Link
+            href="/dashboard/support"
+            className="inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm"
+          >
+            🎧 Suporte
+          </Link>
+
+          <Link
             href="/dashboard/finance/withdraw"
             className="inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 transition shadow-sm"
           >
