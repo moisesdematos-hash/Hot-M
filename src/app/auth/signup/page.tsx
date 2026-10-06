@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton';
 
 export default function SignUpPage() {
   const [fullName, setFullName] = useState('');
@@ -60,7 +61,23 @@ export default function SignUpPage() {
         )}
 
         {!success && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <>
+            <div className="space-y-4 mb-5">
+              <GoogleAuthButton
+                label="Cadastrar com o Google"
+                onError={(err) => setError(err)}
+              />
+
+              <div className="relative flex items-center justify-center">
+                <div className="border-t border-slate-200 dark:border-slate-800 w-full" />
+                <span className="bg-white dark:bg-slate-900 px-3 text-xs text-slate-400 font-medium whitespace-nowrap">
+                  ou preencha os dados abaixo
+                </span>
+                <div className="border-t border-slate-200 dark:border-slate-800 w-full" />
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor="fullName">
                 Nome Completo
@@ -131,6 +148,7 @@ export default function SignUpPage() {
               {isLoading ? 'Cadastrando...' : 'Criar Conta'}
             </button>
           </form>
+          </>
         )}
 
         <div className="mt-6 text-center text-sm text-slate-500">

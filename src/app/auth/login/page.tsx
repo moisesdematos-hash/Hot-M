@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,6 +52,18 @@ export default function LoginPage() {
             {error}
           </div>
         )}
+
+        <div className="space-y-4 mb-5">
+          <GoogleAuthButton onError={(err) => setError(err)} />
+
+          <div className="relative flex items-center justify-center">
+            <div className="border-t border-slate-200 dark:border-slate-800 w-full" />
+            <span className="bg-white dark:bg-slate-900 px-3 text-xs text-slate-400 font-medium whitespace-nowrap">
+              ou continue com email e senha
+            </span>
+            <div className="border-t border-slate-200 dark:border-slate-800 w-full" />
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
