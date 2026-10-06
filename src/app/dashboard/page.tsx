@@ -192,7 +192,7 @@ export default function DashboardMainHubPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-28 md:pb-8 space-y-6 sm:space-y-8">
         {/* Welcome Banner */}
         <div className="rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 p-6 sm:p-8 text-white shadow-xl shadow-orange-600/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
@@ -525,6 +525,36 @@ export default function DashboardMainHubPage() {
           </div>
         </div>
       </main>
+
+      {/* Mobile Fixed Bottom Navigation Bar */}
+      <nav
+        style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 pt-2 flex items-center justify-around text-[10px] font-semibold text-slate-500 shadow-lg"
+      >
+        <Link href="/dashboard" className="flex flex-col items-center gap-0.5 text-orange-600 font-bold p-1">
+          <span className="text-lg">🏠</span>
+          <span>Início</span>
+        </Link>
+        <Link href="/dashboard/products" className="flex flex-col items-center gap-0.5 hover:text-orange-600 p-1">
+          <span className="text-lg">📦</span>
+          <span>Produtos</span>
+        </Link>
+        <Link href="/marketplace" className="flex flex-col items-center gap-0.5 text-orange-500 hover:text-orange-600 font-bold p-1">
+          <span className="text-lg">🔥</span>
+          <span>Hotplace</span>
+        </Link>
+        <Link href="/dashboard/finance" className="flex flex-col items-center gap-0.5 hover:text-orange-600 p-1">
+          <span className="text-lg">💰</span>
+          <span>Carteira</span>
+        </Link>
+        <Link href="/dashboard/notifications" className="relative flex flex-col items-center gap-0.5 hover:text-orange-600 p-1">
+          <span className="text-lg">🔔</span>
+          {unreadNotifications > 0 && (
+            <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-orange-600" />
+          )}
+          <span>Alertas</span>
+        </Link>
+      </nav>
     </div>
   );
 }
