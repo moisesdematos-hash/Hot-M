@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { PwaProvider } from '@/components/pwa/PwaProvider';
+import { HotmAssistantWidget } from '@/components/chat/HotmAssistantWidget';
 
 export const metadata: Metadata = {
   title: 'HOT-M — Plataforma de Infoprodutos e Comércio Digital',
@@ -45,7 +46,10 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased">
-        <PwaProvider>{children}</PwaProvider>
+        <PwaProvider>
+          {children}
+          <HotmAssistantWidget />
+        </PwaProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: '/',
     name: 'HOT-M — Plataforma de Infoprodutos e Comércio Digital',
     short_name: 'HOT-M',
     description: 'Compre e venda cursos, mentorias e e-books com Multicaixa Express e área de membros.',
