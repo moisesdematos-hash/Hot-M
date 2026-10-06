@@ -21,6 +21,9 @@ export default function HomePage() {
           </div>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-400">
+            <Link href="/marketplace" className="text-orange-600 dark:text-orange-400 font-bold flex items-center gap-1">
+              <span>🔥</span> Hotplace
+            </Link>
             <a href="#funcionalidades" className="hover:text-orange-600 dark:hover:text-orange-400 transition">
               Recursos
             </a>
