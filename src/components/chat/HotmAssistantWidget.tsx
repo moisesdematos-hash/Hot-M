@@ -309,3 +309,5 @@ export function HotmAssistantWidget() {
     </>
   );
 }
+
+export default HotmAssistantWidget;

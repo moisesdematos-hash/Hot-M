@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { HotmAssistantWidget } from '@/components/chat/HotmAssistantWidget';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -97,6 +98,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
+      <HotmAssistantWidget />
 
       {/* Alerta de Modo Offline */}
       {isOffline && (
