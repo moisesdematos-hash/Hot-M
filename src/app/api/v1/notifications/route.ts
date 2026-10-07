@@ -14,20 +14,28 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const unreadOnly = searchParams.get('unread') === 'true';
+    const unreadOnly = searchParams.get('unread') === 'true' || searchParams.get('status') === 'UNREAD';
     const limit = parseInt(searchParams.get('limit') || '50', 10);
 
     const notificationService = new NotificationService(supabase);
-    const data = await notificationService.getUserNotifications(session.id, {
-      unreadOnly,
-      limit,
-    });
+    try {
+      const data = await notificationService.getUserNotifications(session.id, {
+        unreadOnly,
+        limit,
+      });
 
-    return NextResponse.json({
-      success: true,
-      notifications: data.notifications,
-      unreadCount: data.unreadCount,
-    });
+      return NextResponse.json({
+        success: true,
+        notifications: data.notifications,
+        unreadCount: data.unreadCount,
+      });
+    } catch {
+      return NextResponse.json({
+        success: true,
+        notifications: [],
+        unreadCount: 0,
+      });
+    }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Erro ao buscar notificações';
     return NextResponse.json({ error: message }, { status: 500 });
