@@ -4,7 +4,7 @@
   "private": true,
   "description": "HOT-M: Global digital products, affiliates, payments, and membership platform",
   "scripts": {
-    "dev": "next dev -p 2009",
+    "dev": "node --max-http-header-size=65536 node_modules/next/dist/bin/next dev -p 2009",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
