@@ -82,9 +82,11 @@ describe('Angolan IBAN Validator & Formatter (AO06 / ISO 13616 / ISO 7064)', () 
   it('exports comprehensive list of registered Angolan banks', () => {
     expect(ANGOLAN_BANKS['0040']).toContain('BAI');
     expect(ANGOLAN_BANKS['0006']).toContain('BFA');
-    expect(ANGOLAN_BANKS['0051']).toContain('Atlântico');
-    expect(ANGOLAN_BANKS['0043']).toContain('BPC');
-    expect(ANGOLAN_BANKS['0058']).toContain('Standard Bank');
-    expect(ANGOLAN_BANKS['0059']).toContain('Sol');
+    expect(ANGOLAN_BANKS['0051']).toBe('Banco BIC');
+    expect(ANGOLAN_BANKS['0055']).toBe('Banco Millennium Atlântico');
+    expect(ANGOLAN_BANKS['0044']).toBe('Banco Sol');
+    expect(ANGOLAN_BANKS['0010']).toContain('BPC');
+    expect(ANGOLAN_BANKS['0005']).toContain('BCI');
+    expect(ANGOLAN_BANKS['0060']).toContain('Standard Bank');
   });
 });
