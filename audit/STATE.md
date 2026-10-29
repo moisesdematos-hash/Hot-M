@@ -17,7 +17,8 @@
 | **F02** | Baseline Reproduzível | **CONCLUÍDO (PASS)** | Nenhum | Testes (159/159 PASS), typecheck (PASS). Identificados defeitos BL-001 (P2 - ESLint) e BL-002 (P3) em `audit/BASELINE.md`. |
 | **F03** | Mapa de Dependências e Riscos | **CONCLUÍDO (PASS)** | Nenhum | Subsistemas mapeados de SYS-01 a SYS-15 com severidades P0-P3 em `audit/RISK_DEPENDENCY_MAP.md`. |
 | **F04** | Plano de Testes e Critérios | **CONCLUÍDO (PASS)** | Nenhum | Casos de teste, critérios de gate e SLOs definidos em `audit/TEST_PLAN_CRITERIA.md`. Gate 01–04 APROVADO. |
-| **F05** | Interface e UX | **EM ANDAMENTO** | Nenhum | Início do Módulo A — Auditoria Funcional e Correção. |
+| **F05** | Interface e UX | **CONCLUÍDO (PASS)** | Nenhum | 29 páginas inspecionadas: 18 forms com onSubmit, 0 links quebrados, empty states e loading spinners verificados. |
+| **F06** | Autenticação e Autorização | **EM ANDAMENTO** | Nenhum | Início de auditoria profunda de sessão, cookies HTTP-Only, OAuth, RBAC e proteção de rotas no backend. |
 
 ---
 

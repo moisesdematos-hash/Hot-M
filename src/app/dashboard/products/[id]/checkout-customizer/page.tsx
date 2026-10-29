@@ -467,7 +467,9 @@ export default function CheckoutCustomizerPage({
 
                 <button
                   type="button"
-                  className="w-full py-3 rounded-xl text-xs font-black text-white shadow-lg transition-transform"
+                  disabled
+                  title="Pré-visualização do botão de pagamento"
+                  className="w-full py-3 rounded-xl text-xs font-black text-white shadow-lg transition-transform opacity-95 cursor-default"
                   style={{ backgroundColor: settings.primaryColor }}
                 >
                   PAGAR VIA MULTICAIXA PROXYPAY
