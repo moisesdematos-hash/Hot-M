@@ -28,15 +28,9 @@ interface MarketplaceProduct {
   isCurated?: boolean;
 }
 
-interface CategoryOption {
-  key: string;
-  label: string;
-}
-
 export default function HotplaceMarketplacePage() {
   const router = useRouter();
   const [products, setProducts] = useState<MarketplaceProduct[]>([]);
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -60,9 +54,6 @@ export default function HotplaceMarketplacePage() {
         const data = await res.json();
         if (res.ok) {
           setProducts(data.products || []);
-          if (data.categories && categories.length === 0) {
-            setCategories(data.categories);
-          }
         }
       } catch {
         // Fallback silencioso
