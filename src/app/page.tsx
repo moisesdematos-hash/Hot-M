@@ -277,6 +277,15 @@ export default function HomePage() {
             <Link href="/dashboard/finance" className="hover:text-orange-600 transition">
               Carteira Financeira
             </Link>
+            <Link href="/terms" className="hover:text-orange-600 transition">
+              Termos de Uso
+            </Link>
+            <Link href="/privacy" className="hover:text-orange-600 transition">
+              Privacidade
+            </Link>
+            <Link href="/refund-policy" className="hover:text-orange-600 transition">
+              Garantia & Reembolso
+            </Link>
             <Link href="/dashboard/support" className="hover:text-orange-600 transition">
               Central de Atendimento
             </Link>

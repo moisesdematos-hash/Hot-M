@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { validateAngolanIBAN, formatAngolanIBAN } from '@/core/fintech/iban-ao';
 
 interface WithdrawalMethod {
   id: string;
@@ -129,13 +130,21 @@ export default function WithdrawPage() {
   async function handleAddMethod(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    // Validação formal de IBAN Angolano
+    const ibanCheck = validateAngolanIBAN(newAccountNumber);
+    if (!ibanCheck.isValid) {
+      setError(ibanCheck.errorMessage || 'IBAN angolano inválido. Verifique o número digitado.');
+      return;
+    }
+
     try {
       const res = await fetch('/api/v1/finance/withdrawal-methods', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          bankName: newBankName,
-          accountNumber: newAccountNumber,
+          bankName: ibanCheck.bankName ? `${newBankName} (${ibanCheck.bankName})` : newBankName,
+          accountNumber: ibanCheck.ibanFormatted,
           holderName: newHolderName,
           methodType: 'IBAN_AO',
         }),
@@ -378,15 +387,34 @@ export default function WithdrawPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">IBAN / Número de Conta</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">IBAN Angolano (AO06)</label>
                 <input
                   type="text"
                   required
                   placeholder="AO06.0040.0000.XXXX.XXXX.XXXX.X"
                   value={newAccountNumber}
-                  onChange={(e) => setNewAccountNumber(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  onChange={(e) => setNewAccountNumber(formatAngolanIBAN(e.target.value))}
+                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono tracking-wider"
                 />
+                {newAccountNumber.trim() && (
+                  <div className="mt-1.5 text-[11px]">
+                    {(() => {
+                      const check = validateAngolanIBAN(newAccountNumber);
+                      if (check.isValid) {
+                        return (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                            <span>✓</span> IBAN Válido — {check.bankName}
+                          </span>
+                        );
+                      }
+                      return (
+                        <span className="text-amber-600 dark:text-amber-400">
+                          ℹ️ {check.errorMessage || '25 caracteres iniciando com AO'}
+                        </span>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
 
               <div>

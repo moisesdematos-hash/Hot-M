@@ -1,0 +1,9 @@
+{
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/v1/cron/outbox-worker",
+      "schedule": "*/2 * * * *"
+    }
+  ]
+}

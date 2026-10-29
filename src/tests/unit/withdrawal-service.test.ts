@@ -185,4 +185,64 @@ describe('WithdrawalService Unit Tests (Phase 10 - Withdrawals Engine)', () => {
       ])
     );
   });
+
+  it('createWithdrawalMethod rejects invalid Angolan IBAN with detailed reason', async () => {
+    const mockSupabase = {} as unknown as SupabaseClient;
+    const service = new WithdrawalService(mockSupabase);
+
+    await expect(
+      service.createWithdrawalMethod(userId, {
+        accountNumber: 'AO06.123', // Too short, invalid MOD-97
+        bankName: 'BAI',
+        holderName: 'Valid Holder',
+        methodType: 'IBAN_AO',
+      })
+    ).rejects.toThrow('INVALID_IBAN_AO');
+  });
+
+  it('createWithdrawalMethod accepts valid Angolan IBAN and formats properly', async () => {
+    const mockInsert = vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({
+          data: {
+            id: 'new-method-id',
+            user_id: userId,
+            account_number: 'AO69.0040.0000.1234.5678.9010.0',
+            bank_name: 'BAI (BAI — Banco Angolano de Investimentos)',
+            holder_name: 'Valid Holder',
+            method_type: 'IBAN_AO',
+            is_verified: true,
+            created_at: new Date().toISOString(),
+          },
+          error: null,
+        }),
+      }),
+    });
+
+    const mockSupabase = {
+      from: vi.fn().mockImplementation((table: string) => {
+        if (table === 'withdrawal_methods') {
+          return { insert: mockInsert };
+        }
+        return {};
+      }),
+    } as unknown as SupabaseClient;
+
+    const service = new WithdrawalService(mockSupabase);
+    const result = await service.createWithdrawalMethod(userId, {
+      accountNumber: 'AO69004000001234567890100',
+      bankName: 'BAI',
+      holderName: 'Valid Holder',
+      methodType: 'IBAN_AO',
+    });
+
+    expect(result.id).toBe('new-method-id');
+    expect(result.accountNumber).toContain('AO69');
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        account_number: 'AO69.0040.0000.1234.5678.9010.0',
+        method_type: 'IBAN_AO',
+      })
+    );
+  });
 });

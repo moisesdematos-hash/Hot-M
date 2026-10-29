@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from '@/core/database/supabase-server';
 import { AuthService } from '@/modules/auth/auth-service';
 import { OutboxService } from '@/modules/notifications/outbox-service';
 
-export async function POST(request: Request) {
+async function handleWorker(request: Request) {
   try {
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET || 'hot-m-cron-secret-local';
@@ -49,4 +49,12 @@ export async function POST(request: Request) {
     const message = err instanceof Error ? err.message : 'Erro ao executar outbox worker';
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+export async function GET(request: Request) {
+  return handleWorker(request);
+}
+
+export async function POST(request: Request) {
+  return handleWorker(request);
 }

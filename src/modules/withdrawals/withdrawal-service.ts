@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { CurrencyCode, Money } from '@/core/fintech/money';
 import { WithdrawalStateMachine, WithdrawalStatus } from '@/core/fintech/state-machines';
 import { LedgerService } from '@/modules/ledger/ledger-service';
+import { validateAngolanIBAN, sanitizeIBAN } from '@/core/fintech/iban-ao';
 
 export interface WithdrawalMethodRecord {
   id: string;
@@ -164,15 +165,31 @@ export class WithdrawalService {
       throw new Error('INVALID_HOLDER_NAME: Titular da conta obrigatório');
     }
 
+    const methodType = input.methodType || 'IBAN_AO';
+    let savedAccountNumber = input.accountNumber.trim();
+    let detectedBankName = input.bankName.trim();
+
+    // Validação formal de IBAN Angolano (AO06)
+    if (methodType === 'IBAN_AO' || sanitizeIBAN(input.accountNumber).startsWith('AO')) {
+      const ibanCheck = validateAngolanIBAN(input.accountNumber);
+      if (!ibanCheck.isValid) {
+        throw new Error(`INVALID_IBAN_AO: ${ibanCheck.errorMessage || 'IBAN angolano inválido'}`);
+      }
+      savedAccountNumber = ibanCheck.ibanFormatted;
+      if (ibanCheck.bankName) {
+        detectedBankName = `${detectedBankName} (${ibanCheck.bankName})`;
+      }
+    }
+
     const { data, error } = await this.client
       .from('withdrawal_methods')
       .insert({
         user_id: userId,
-        method_type: input.methodType || 'IBAN_AO',
-        account_number: input.accountNumber.trim(),
-        bank_name: input.bankName.trim(),
+        method_type: methodType,
+        account_number: savedAccountNumber,
+        bank_name: detectedBankName,
         holder_name: input.holderName.trim(),
-        is_verified: true, // In production, IBAN check or receipt validation
+        is_verified: true,
       })
       .select('*')
       .single();
