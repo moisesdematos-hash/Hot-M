@@ -63,7 +63,7 @@ if (existsSync(envLocalPath)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) return;
     const match = trimmed.match(/^([^=]+)=(.*)$/);
-    if (match) {
+    if (match && match[1] && match[2] !== undefined) {
       const key = match[1].trim();
       let value = match[2].trim();
       if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {

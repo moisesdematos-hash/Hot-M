@@ -175,6 +175,87 @@ export class EmailService {
   }
 
   /**
+   * Template: Multicaixa Reference Pending Payment Instructions (ProxyPay Angola)
+   */
+  createMulticaixaPendingEmail(data: {
+    buyerName: string;
+    productTitle: string;
+    entity: string;
+    reference: string;
+    amount: string;
+    currency: string;
+    expiresAt: string;
+    checkoutUrl?: string;
+  }): { subject: string; html: string } {
+    // Formata a referência em blocos de 3 para facilitar a digitação no Multicaixa Express / ATM (ex: 123 456 789)
+    const formattedRef = data.reference.replace(/(\d{3})(?=\d)/g, '$1 ');
+    const subject = `💳 Referência de Pagamento Multicaixa: ${data.productTitle}`;
+
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 28px; color: #1e293b; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #ea580c; font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">HOT-M</h1>
+          <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0; text-transform: uppercase; tracking: 1px;">Pagamento por Multicaixa / ProxyPay</p>
+        </div>
+
+        <div style="background-color: #fff7ed; border-radius: 8px; padding: 18px; margin-bottom: 24px; border: 1px solid #ffedd5;">
+          <h2 style="font-size: 17px; margin: 0 0 8px 0; color: #9a3412;">Olá, ${data.buyerName}!</h2>
+          <p style="font-size: 14px; line-height: 1.5; margin: 0; color: #7c2d12;">
+            O seu pedido para <strong>${data.productTitle}</strong> foi registado com sucesso. Para concluir a compra e aceder ao conteúdo, utilize os dados de pagamento abaixo no seu Multicaixa Express, ATM ou Homebanking.
+          </p>
+        </div>
+
+        <!-- Box Oficial Multicaixa -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 12px; padding: 24px; color: #ffffff; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 12px; margin-bottom: 16px;">
+            <span style="font-size: 13px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Rede Multicaixa (EMIS)</span>
+            <span style="background-color: #ea580c; color: #ffffff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Pagamento de Serviços</span>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+            <tr>
+              <td style="padding: 8px 0; color: #cbd5e1;">Entidade:</td>
+              <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 20px; font-weight: 700; color: #f8fafc; letter-spacing: 1px;">${data.entity}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #cbd5e1;">Referência:</td>
+              <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 22px; font-weight: 800; color: #fb923c; letter-spacing: 2px;">${formattedRef}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #cbd5e1;">Montante:</td>
+              <td style="padding: 8px 0; text-align: right; font-size: 20px; font-weight: 800; color: #4ade80;">${data.amount} ${data.currency}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #94a3b8; font-size: 12px;">Válido até:</td>
+              <td style="padding: 8px 0; text-align: right; font-size: 13px; color: #fca5a5;">${data.expiresAt}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="background-color: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 24px; border: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
+          <h3 style="font-size: 14px; font-weight: 700; margin: 0 0 8px 0; color: #1e293b;">Como pagar:</h3>
+          <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
+            <li>Abra o aplicativo <strong>Multicaixa Express</strong> ou dirija-se a um Caixa Automático (ATM).</li>
+            <li>Selecione <strong>Pagamentos</strong> &rarr; <strong>Pagamento por Referência</strong> (ou Pagamento de Serviços).</li>
+            <li>Digite a Entidade <strong>${data.entity}</strong> e a Referência <strong>${data.reference}</strong>.</li>
+            <li>Confirme o valor exato de <strong>${data.amount} ${data.currency}</strong> e valide o pagamento.</li>
+          </ol>
+        </div>
+
+        <p style="font-size: 12px; color: #64748b; text-align: center; margin: 0;">
+          ⚡ Assim que efetuar o pagamento, a confirmação é imediata e os seus acessos serão enviados automaticamente para este e-mail.
+        </p>
+
+        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+          HOT-M — Conteúdo e Produtos Digitais &bull; República de Angola
+        </p>
+      </div>
+    `;
+
+    return { subject, html };
+  }
+
+  /**
    * Template: Creator / Affiliate New Sale Notification
    */
   createSaleAlertEmail(data: {

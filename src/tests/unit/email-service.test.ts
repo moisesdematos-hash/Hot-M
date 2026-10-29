@@ -124,4 +124,25 @@ describe('EmailService Unit Tests (Phase 18 - Transactional Email Gateway)', () 
     expect(alert.html).toContain('Guia Definitivo Next.js');
     expect(alert.html).toContain('+12500.00 AOA');
   });
+
+  it('generates rich Multicaixa pending reference email with formatted reference', () => {
+    const service = new EmailService();
+    const email = service.createMulticaixaPendingEmail({
+      buyerName: 'Carlos Silva',
+      productTitle: 'Masterclass Tráfego Pago',
+      entity: '99999',
+      reference: '123456789',
+      amount: '25000.00',
+      currency: 'AOA',
+      expiresAt: '30/10/2026 23:59',
+    });
+
+    expect(email.subject).toContain('Referência de Pagamento Multicaixa');
+    expect(email.subject).toContain('Masterclass Tráfego Pago');
+    expect(email.html).toContain('99999');
+    expect(email.html).toContain('123 456 789'); // formatado em blocos
+    expect(email.html).toContain('25000.00 AOA');
+    expect(email.html).toContain('30/10/2026 23:59');
+    expect(email.html).toContain('Multicaixa Express');
+  });
 });
