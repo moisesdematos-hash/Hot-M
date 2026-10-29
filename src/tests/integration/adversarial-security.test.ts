@@ -12,12 +12,11 @@
  *  F25: Consolidação, caminhos alternativos, verificação de patch
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { RBACManager } from '@/core/security/rbac';
 import { EntitlementService } from '@/modules/entitlements/entitlement-service';
 import { OrderService } from '@/modules/orders/order-service';
 import { WebhookEngine } from '@/modules/webhooks/webhook-engine';
-import { PaymentService } from '@/modules/payments/payment-service';
 import { ProxyPayAdapter } from '@/modules/payments/providers/proxypay';
 import { PricingEngine } from '@/modules/pricing/pricing-engine';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -556,7 +555,6 @@ describe('F23 — Webhook: Replay, Montante Errado e Eventos Fora de Ordem', () 
       orderMinor = 500000n,
       paidCurrency = 'AOA',
       orderCurrency = 'AOA',
-      paymentStatus = 'PAID',
     } = opts;
 
     return {
@@ -910,7 +908,7 @@ describe('F25 — Gate Adversarial: Consolidação e Verificação de Patches', 
     await expect(
       adapter.createPayment({
         orderId: ALICE_ORDER_ID,
-        customer: { id: ALICE_ID, email: 'alice@test.ao', fullName: 'Alice' },
+        customer: { id: ALICE_ID, email: 'alice@test.ao', name: 'Alice' },
         amount: usdMoney,
       })
     ).rejects.toThrow(/AOA/i);
