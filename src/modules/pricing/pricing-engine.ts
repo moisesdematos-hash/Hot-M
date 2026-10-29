@@ -68,6 +68,9 @@ export class PricingEngine {
           discountMoney = baseMoney.multiply(percent / 100);
         } else if (coupon.discount_type === 'FIXED_AMOUNT') {
           discountMoney = Money.fromMinor(coupon.discount_value, currency);
+        } else {
+          // BUG-ADV-001 (P2): Unknown discount_type must be rejected, not silently ignored.
+          throw new Error(`Cupom '${couponCode}' tem tipo de desconto inválido: ${coupon.discount_type}`);
         }
 
         // Cap discount at base price
