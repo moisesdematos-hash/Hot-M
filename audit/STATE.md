@@ -3,9 +3,9 @@
 - **Branch Atual:** `audit-saas-master-360`
 - **Commit Inicial SHA:** `329a55178ebc044542f11b6ae3bb0c0333852072`
 - **Data/Hora de Início:** 2026-10-29T10:05:00Z
-- **Fase Atual:** FASE 01 — Inventário Técnico & Mapeamento de Arquitetura
-- **Gate Atual:** FASE 01 (EM EXECUÇÃO)
-- **Status Geral:** DIAGNÓSTICO E MAPEAMENTO
+- **Fase Atual:** FASE 20 — Módulo C: Superfície de Ataque e Auditoria Adversarial Defensiva
+- **Gate Atual:** GATE B (APROVADO) -> MÓDULO C EM EXECUÇÃO
+- **Status Geral:** AUDITORIA ADVERSARIAL E DEFESA
 
 ---
 
@@ -25,7 +25,14 @@
 | **F10** | Deduplicação Segura | **CONCLUÍDO (PASS)** | Nenhum | Zero identificadores duplicados, types centralizados e código limpo. |
 | **F11** | Testes Automatizados | **CONCLUÍDO (PASS)** | Nenhum | 159 testes (119 unitários + 40 de integração) cobrindo jornadas de comprador, produtor e admin. |
 | **F12** | Gate Funcional | **CONCLUÍDO (PASS)** | Nenhum | Certificação emitida em `audit/FUNCTIONAL_CERTIFICATION.md`. P0=0, P1=0. Gate Funcional APROVADO. |
-| **F13** | Medição antes de otimizar | **EM ANDAMENTO** | Nenhum | Início do Módulo B — Gargalos, Custos e Escalabilidade. |
+| **F13** | Medição antes de otimizar | **CONCLUÍDO (PASS)** | Nenhum | First Load JS de 103 kB compartilhado, maior página estática 108 kB. Relatado em `audit/BOTTLENECK_REPORT.md`. |
+| **F14** | Frontend e Rede | **CONCLUÍDO (PASS)** | Nenhum | Criado `src/app/loading.tsx` para streaming instantâneo. Adicionado `loading="lazy"` e `decoding="async"` nas capas do marketplace. |
+| **F15** | Backend e Banco | **CONCLUÍDO (PASS)** | Nenhum | Zero N+1 queries. Índices existentes cobrem ordenações e filtros principais. |
+| **F16** | IA e Serviços Externos | **CONCLUÍDO (PASS)** | Nenhum | Motor de Conhecimento autônomo offline em memória (0 tokens, 0 latência externa). Webhooks ProxyPay e Resend com outbox. |
+| **F17** | Carga e Resiliência | **CONCLUÍDO (PASS)** | Nenhum | Teste de concorrência financeira e idempotência de webhook reexecutados com 100% de sucesso. |
+| **F18** | Otimizações Justificadas | **CONCLUÍDO (PASS)** | Nenhum | Zero regressão: 159/159 testes PASS, build limpo em 12.5s, 0 avisos de linter. |
+| **F19** | Gate de Performance | **CONCLUÍDO (PASS)** | Nenhum | Relatório emitido em `audit/BOTTLENECK_REPORT.md`. Gate B APROVADO sem bloqueadores. |
+| **F20** | Superfície de Ataque | **EM ANDAMENTO** | Nenhum | Início do Módulo C — Auditoria Adversarial Defensiva. |
 
 ---
 
@@ -33,5 +40,5 @@
 - *Nenhum bloqueador P0/P1 registrado até o momento.*
 
 ## Próximos Comandos Operacionais
-1. Executar F13 a F19 (Módulo B: Análise de Bundle, Renders, Queries, Concorrência e Gargalos).
-2. Gerar `audit/BOTTLENECK_REPORT.md` e validar Gate de Performance.
+1. Executar F20 a F25 (Módulo C: IDOR com 2 contas sintéticas, XSS/SQLi, Replay de Webhook, Abuso de Cupons/Moeda, Simulação de Falhas).
+2. Gerar `audit/ADVERSARIAL_REPORT.md` e validar Gate Adversarial.

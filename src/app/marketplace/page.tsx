@@ -336,9 +336,12 @@ export default function HotplaceMarketplacePage() {
                 <div>
                   {/* Capa com Badge e Temperatura */}
                   <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.coverImageUrl}
                       alt={item.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                     />
 
@@ -454,9 +457,12 @@ export default function HotplaceMarketplacePage() {
 
             {/* Top Modal Info */}
             <div className="flex flex-col sm:flex-row items-start gap-5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={selectedProduct.coverImageUrl}
                 alt={selectedProduct.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full sm:w-36 h-36 object-cover rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
               />
               <div className="space-y-2 flex-1">
