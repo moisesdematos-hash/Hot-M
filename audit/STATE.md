@@ -3,9 +3,9 @@
 - **Branch Atual:** `audit-saas-master-360`
 - **Commit Inicial SHA:** `329a55178ebc044542f11b6ae3bb0c0333852072`
 - **Data/Hora de Início:** 2026-10-29T10:05:00Z
-- **Fase Atual:** FASE 32 — Lançamento Autorizado em Produção (BLOQUEADA POR DESIGN)
-- **Gate Atual:** GATE D (APROVADO) -> GO-LIVE CONCLUÍDO
-- **Status Geral:** PRODUCTION READY — AWAITING OWNER APPROVAL
+- **Fase Atual:** FASE 32 — Lançamento Autorizado e Pós-Lançamento (EM EXECUÇÃO)
+- **Gate Atual:** GATE D (APROVADO) -> FASE 32 AUTORIZADA PELO PROPRIETÁRIO
+- **Status Geral:** DEPLOYMENT E SMOKE TESTS EM ANDAMENTO
 
 ---
 
@@ -44,7 +44,7 @@
 | **F29** | Negócio e Experiência | **CONCLUÍDO (PASS)** | Nenhum | Jornada completa de compra, checkout, entrega digital e LMS comissionamento validada. |
 | **F30** | Observabilidade e Capacidade | **CONCLUÍDO (PASS)** | Nenhum | Tabela de auditoria `audit_logs`, outbox transactional, logs sanitizados sem PII. |
 | **F31** | Decisão GO / NO-GO | **CONCLUÍDO (PASS)** | Nenhum | 5 documentos de GO-LIVE emitidos. Declarado `PRODUCTION READY — AWAITING OWNER APPROVAL`. |
-| **F32** | Lançamento Autorizado | **BLOQUEADO POR DESIGN** | Autorização Humana | Aguardando ordem e autorização explícita do proprietário para deployment em produção. |
+| **F32** | Lançamento Autorizado | **EM ANDAMENTO** | Nenhum | Autorização expressa concedida pelo proprietário em 2026-10-29. Merge, build de produção e smoke tests finais. |
 
 ---
 
