@@ -12,6 +12,7 @@
     "test": "vitest run src/tests/unit",
     "test:integration": "vitest run src/tests/integration",
     "test:all": "vitest run",
+    "preflight:prod": "npx tsx scripts/preflight.ts",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\""
   },
   "dependencies": {
