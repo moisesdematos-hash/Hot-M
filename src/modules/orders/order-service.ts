@@ -12,6 +12,12 @@ export interface OrderRecord {
   total_amount_minor: bigint;
   status: OrderStatus;
   affiliate_id: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_content?: string | null;
+  utm_term?: string | null;
+  src?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -108,6 +114,12 @@ export class OrderService {
         total_amount_minor: quote.totalAmountMinor,
         status: 'PENDING_PAYMENT',
         affiliate_id: affiliateId,
+        utm_source: input.utmSource || null,
+        utm_medium: input.utmMedium || null,
+        utm_campaign: input.utmCampaign || null,
+        utm_content: input.utmContent || null,
+        utm_term: input.utmTerm || null,
+        src: input.src || null,
       })
       .select()
       .single();

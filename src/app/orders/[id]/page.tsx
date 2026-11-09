@@ -2,6 +2,14 @@
 
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
+import PixelTracker from '@/components/marketing/PixelTracker';
+
+interface OrderItemData {
+  id: string;
+  product_id: string;
+  unit_amount_minor: string;
+  quantity: number;
+}
 
 interface OrderData {
   id: string;
@@ -18,6 +26,7 @@ export default function OrderSummaryPage({
 }) {
   const { id } = use(params);
   const [order, setOrder] = useState<OrderData | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,6 +43,7 @@ export default function OrderSummaryPage({
         const data = await res.json();
         if (res.ok) {
           setOrder(data.order);
+          setOrderItems(data.items || []);
         } else {
           setError(data.error || 'Erro ao carregar pedido');
         }
@@ -107,6 +117,19 @@ export default function OrderSummaryPage({
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
+      {/* Track Purchase Event on Paid Orders */}
+      {isPaid && orderItems.length > 0 && orderItems[0] && (
+        <PixelTracker
+          productId={orderItems[0].product_id}
+          pageType="PURCHASE"
+          eventData={{
+            orderId: order.id,
+            value: Number(order.total_amount_minor) / 100,
+            currency: order.currency,
+          }}
+        />
+      )}
+
       <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center space-y-4 shadow-sm">
         <div
           className={`inline-flex items-center justify-center w-12 h-12 rounded-full mx-auto ${

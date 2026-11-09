@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback, use } from 'react';
 import { useRouter } from 'next/navigation';
+import PixelTracker, { getStoredUtmParams } from '@/components/marketing/PixelTracker';
 
 interface QuoteData {
   quoteId: string;
@@ -230,10 +231,14 @@ export default function CheckoutPage({
     setIsSubmitting(true);
 
     try {
+      const utmParams = getStoredUtmParams();
       const res = await fetch('/api/v1/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quoteId: quote.quoteId }),
+        body: JSON.stringify({
+          quoteId: quote.quoteId,
+          ...utmParams,
+        }),
       });
 
       const data = await res.json();
@@ -285,6 +290,16 @@ export default function CheckoutPage({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white pb-16">
+      {/* Dynamic Ad Pixels & UTM Tracking */}
+      <PixelTracker
+        productId={quote.productId}
+        pageType="CHECKOUT"
+        eventData={{
+          value: parseFloat(quote.totalAmount || '0'),
+          currency: quote.currency,
+        }}
+      />
+
       {/* 1. Urgency Countdown Timer Bar */}
       {checkoutSettings?.showCountdownTimer && (
         <div

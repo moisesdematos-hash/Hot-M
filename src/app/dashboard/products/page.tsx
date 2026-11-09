@@ -113,6 +113,12 @@ export default function CreatorProductsPage() {
                 >
                   🎨 Checkout
                 </Link>
+                <Link
+                  href={`/dashboard/products/${p.id}/pixels`}
+                  className="text-orange-600 dark:text-orange-400 hover:text-orange-700 transition font-medium"
+                >
+                  🎯 Pixels
+                </Link>
                 {p.product_type === 'COURSE' && (
                   <Link
                     href={`/dashboard/products/${p.id}/course`}
