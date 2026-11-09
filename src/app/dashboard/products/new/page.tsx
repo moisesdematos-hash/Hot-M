@@ -125,7 +125,7 @@ export default function NewProductPage() {
         {productType === 'DIGITAL_DOWNLOAD' && (
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="assetFile">
-              Caminho do Arquivo para Entrega
+              Caminho do Arquivo ou Link de Entrega
             </label>
             <input
               id="assetFile"
@@ -133,10 +133,10 @@ export default function NewProductPage() {
               value={assetFileUrl}
               onChange={(e) => setAssetFileUrl(e.target.value)}
               className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="Ex: products/ebook-financas.pdf"
+              placeholder="Ex: products/ebook.pdf ou https://drive.google.com/..."
             />
             <p className="text-xs text-slate-500 mt-1">
-              O arquivo fica armazenado em bucket privado e só é liberado via URL assinada após confirmação do pagamento.
+              Coloque o caminho do arquivo no Supabase Storage (bucket privado <code>digital_assets</code>) para gerar links temporários anti-pirataria, ou cole um link direto (Google Drive, Dropbox, Notion, etc.).
             </p>
           </div>
         )}

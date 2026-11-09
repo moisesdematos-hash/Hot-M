@@ -151,19 +151,23 @@ export class EntitlementService {
       throw new Error('ASSET_NOT_CONFIGURED: Arquivo do produto não configurado pelo criador');
     }
 
-    // 2. Generate signed URL via Supabase Storage
+    // 2. Generate signed URL via Supabase Storage or external link
     const assetPath = product.asset_file_url;
     let downloadUrl = '';
 
-    const { data: signedData, error: storageError } = await this.client.storage
-      .from('digital_assets')
-      .createSignedUrl(assetPath, expiresInSeconds);
-
-    if (storageError || !signedData?.signedUrl) {
-      // Fallback if storage mock doesn't include path or in test environment
-      downloadUrl = `https://download.hot-m.internal/storage/v1/digital_assets/${encodeURIComponent(assetPath)}?token=signed_${Date.now()}`;
+    if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
+      downloadUrl = assetPath;
     } else {
-      downloadUrl = signedData.signedUrl;
+      const { data: signedData, error: storageError } = await this.client.storage
+        .from('digital_assets')
+        .createSignedUrl(assetPath, expiresInSeconds);
+
+      if (storageError || !signedData?.signedUrl) {
+        // Fallback if storage mock doesn't include path or in test environment
+        downloadUrl = `https://download.hot-m.internal/storage/v1/digital_assets/${encodeURIComponent(assetPath)}?token=signed_${Date.now()}`;
+      } else {
+        downloadUrl = signedData.signedUrl;
+      }
     }
 
     const fileName = assetPath.split('/').pop() || 'arquivo_digital';
