@@ -26,6 +26,7 @@ interface MarketplaceProduct {
   modulesCount?: number;
   durationHours?: number;
   isCurated?: boolean;
+  isSponsored?: boolean;
 }
 
 export default function HotplaceMarketplacePage() {
@@ -331,7 +332,7 @@ export default function HotplaceMarketplacePage() {
             {products.map((item) => (
               <div
                 key={item.id}
-                className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-xl hover:border-orange-500/50 dark:hover:border-orange-500/50 transition duration-300 flex flex-col justify-between"
+                className={`group rounded-2xl border ${item.isSponsored ? 'border-amber-400 dark:border-amber-500 ring-2 ring-amber-400/40 shadow-lg shadow-amber-500/10' : 'border-slate-200 dark:border-slate-800'} bg-white dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-xl hover:border-orange-500/50 dark:hover:border-orange-500/50 transition duration-300 flex flex-col justify-between`}
               >
                 <div>
                   {/* Capa com Badge e Temperatura */}
@@ -353,7 +354,7 @@ export default function HotplaceMarketplacePage() {
 
                     {/* Badge do Produto */}
                     {item.badge && (
-                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-black bg-orange-600 text-white shadow-sm">
+                      <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-black shadow-sm ${item.isSponsored ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black ring-1 ring-white/50' : 'bg-orange-600 text-white'}`}>
                         {item.badge}
                       </div>
                     )}

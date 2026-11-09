@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/core/database/supabase-server';
+import { SponsorshipService } from '@/modules/marketing/sponsorship-service';
 
 export interface MarketplaceProduct {
   id: string;
@@ -24,6 +25,7 @@ export interface MarketplaceProduct {
   modulesCount?: number;
   durationHours?: number;
   isCurated?: boolean;
+  isSponsored?: boolean;
 }
 
 // Catálogo curado de alta conversão para o mercado angolano e internacional
@@ -203,6 +205,11 @@ export async function GET(request: Request) {
 
     // Buscar produtos reais cadastrados no Supabase com ofertas ativas
     let dbProducts: MarketplaceProduct[] = [];
+    const sponsorshipService = new SponsorshipService(supabase);
+    const activeSponsoredIds = await sponsorshipService
+      .listActiveSponsoredProductIds()
+      .catch(() => new Set<string>());
+
     try {
       const { data, error } = await supabase
         .from('products')
@@ -240,6 +247,7 @@ export async function GET(request: Request) {
           const major = Number(rawAmountMinor) / 100;
           const formatted = `${major.toLocaleString('pt-AO')} ${currency === 'AOA' ? 'Kz' : currency}`;
           const profile = p.user_profiles as unknown as { full_name?: string } | null;
+          const isSponsored = activeSponsoredIds.has(p.id);
 
           return {
             id: p.id,
@@ -250,11 +258,11 @@ export async function GET(request: Request) {
             productType: (p.product_type === 'COURSE' ? 'COURSE' : 'DIGITAL_DOWNLOAD') as 'COURSE' | 'DIGITAL_DOWNLOAD',
             coverImageUrl: p.cover_image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80',
             creatorName: profile?.full_name || 'Produtor HOT-M',
-            temperature: 100,
+            temperature: isSponsored ? 200 : 100,
             rating: 5.0,
             reviewCount: 1,
             guaranteeDays: 7,
-            badge: '🔥 NOVO NO HOTPLACE',
+            badge: isSponsored ? '⭐ PATROCINADO' : '🔥 NOVO NO HOTPLACE',
             priceAmountMinor: rawAmountMinor,
             priceFormatted: formatted,
             currency,
@@ -265,6 +273,7 @@ export async function GET(request: Request) {
               'Suporte direto do produtor na plataforma',
             ],
             isCurated: false,
+            isSponsored,
           };
         });
       }
@@ -296,16 +305,22 @@ export async function GET(request: Request) {
       allProducts = allProducts.filter((p) => p.productType === productType);
     }
 
-    // 4. Ordenação
-    if (sort === 'trending') {
-      allProducts.sort((a, b) => b.temperature - a.temperature);
-    } else if (sort === 'rating') {
-      allProducts.sort((a, b) => b.rating - a.rating);
-    } else if (sort === 'price_asc') {
-      allProducts.sort((a, b) => Number(a.priceAmountMinor) - Number(b.priceAmountMinor));
-    } else if (sort === 'price_desc') {
-      allProducts.sort((a, b) => Number(b.priceAmountMinor) - Number(a.priceAmountMinor));
-    }
+    // 4. Ordenação (Patrocinados no topo com máxima prioridade)
+    allProducts.sort((a, b) => {
+      if (a.isSponsored && !b.isSponsored) return -1;
+      if (!a.isSponsored && b.isSponsored) return 1;
+
+      if (sort === 'trending') {
+        return b.temperature - a.temperature;
+      } else if (sort === 'rating') {
+        return b.rating - a.rating;
+      } else if (sort === 'price_asc') {
+        return Number(a.priceAmountMinor) - Number(b.priceAmountMinor);
+      } else if (sort === 'price_desc') {
+        return Number(b.priceAmountMinor) - Number(a.priceAmountMinor);
+      }
+      return 0;
+    });
 
     return NextResponse.json({
       success: true,

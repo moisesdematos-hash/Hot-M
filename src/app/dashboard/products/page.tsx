@@ -119,6 +119,12 @@ export default function CreatorProductsPage() {
                 >
                   🎯 Pixels
                 </Link>
+                <Link
+                  href={`/dashboard/products/${p.id}/sponsor`}
+                  className="text-amber-600 dark:text-amber-400 hover:text-amber-500 transition font-semibold"
+                >
+                  🚀 Impulsionar
+                </Link>
                 {p.product_type === 'COURSE' && (
                   <Link
                     href={`/dashboard/products/${p.id}/course`}
