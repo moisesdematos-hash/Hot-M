@@ -270,6 +270,38 @@ export class OutboxService {
         break;
       }
 
+
+      case 'order.multicaixa_reminder': {
+        const buyerEmail = payload.buyerEmail as string | undefined;
+        const buyerName = (payload.buyerName as string) || 'Cliente';
+        const productTitle = (payload.productTitle as string) || 'o seu produto digital';
+        const entity = (payload.entity as string) || '99999';
+        const reference = (payload.reference as string) || '';
+        const amount = (payload.amount as string) || '0.00';
+        const currency = (payload.currency as string) || 'AOA';
+        const expiresAt = (payload.expiresAt as string) || 'Brevemente';
+        const checkoutUrl = payload.checkoutUrl as string | undefined;
+
+        if (buyerEmail && reference) {
+          const emailData = this.emailService.createMulticaixaReminderEmail({
+            buyerName,
+            productTitle,
+            entity,
+            reference,
+            amount,
+            currency,
+            expiresAt,
+            checkoutUrl,
+          });
+          await this.emailService.sendEmail({
+            to: buyerEmail,
+            subject: emailData.subject,
+            html: emailData.html,
+          });
+        }
+        break;
+      }
+
       case 'refund.approved': {
         const buyerId = payload.buyerId as string;
         const amount = payload.amount as string;

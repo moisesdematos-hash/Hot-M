@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/core/database/supabase-server';
 import { AuthService } from '@/modules/auth/auth-service';
 import { OutboxService } from '@/modules/notifications/outbox-service';
+import { RemarketingService } from '@/modules/marketing/remarketing-service';
 
 async function handleWorker(request: Request) {
   try {
@@ -37,13 +38,20 @@ async function handleWorker(request: Request) {
     const { searchParams } = new URL(request.url);
     const batchSize = parseInt(searchParams.get('batch') || '20', 10);
 
+    // Executa a recuperação de referências Multicaixa pendentes (Pilar 3)
+    const remarketingService = new RemarketingService(supabase);
+    const remarketing = await remarketingService
+      .processPendingReferenceReminders(batchSize)
+      .catch(() => ({ remindedCount: 0, skippedCount: 0 }));
+
     const outboxService = new OutboxService(supabase);
     const result = await outboxService.processPendingEvents(batchSize);
 
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
-      ...result,
+      outbox: result,
+      remarketing,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Erro ao executar outbox worker';

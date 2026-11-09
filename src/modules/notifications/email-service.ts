@@ -255,6 +255,77 @@ export class EmailService {
     return { subject, html };
   }
 
+
+  /**
+   * Template: Multicaixa Reference Reminder / Recovery Email (Angola Remarketing)
+   */
+  createMulticaixaReminderEmail(data: {
+    buyerName: string;
+    productTitle: string;
+    entity: string;
+    reference: string;
+    amount: string;
+    currency: string;
+    expiresAt: string;
+    checkoutUrl?: string;
+  }): { subject: string; html: string } {
+    const formattedRef = data.reference.replace(/(\d{3})(?=\d)/g, '$1 ');
+    const subject = `⏳ [Aviso] A sua referência Multicaixa para "${data.productTitle}" expira em breve`;
+
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 28px; color: #1e293b; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #ea580c; font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">HOT-M</h1>
+          <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0; text-transform: uppercase;">Lembrete de Pagamento Multicaixa</p>
+        </div>
+
+        <div style="background-color: #fef2f2; border-radius: 8px; padding: 18px; margin-bottom: 24px; border: 1px solid #fee2e2;">
+          <h2 style="font-size: 17px; margin: 0 0 8px 0; color: #991b1b;">Não perca o seu acesso, ${data.buyerName}!</h2>
+          <p style="font-size: 14px; line-height: 1.5; margin: 0; color: #7f1d1d;">
+            Notamos que a referência Multicaixa para <strong>${data.productTitle}</strong> ainda não foi paga e irá expirar em breve.
+          </p>
+        </div>
+
+        <!-- Box Multicaixa -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 12px; padding: 24px; color: #ffffff; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 12px; margin-bottom: 16px;">
+            <span style="font-size: 13px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Multicaixa Express / ATM</span>
+            <span style="background-color: #ea580c; color: #ffffff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;">PAGAR AGORA</span>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+            <tr>
+              <td style="padding: 8px 0; color: #cbd5e1;">Entidade:</td>
+              <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 20px; font-weight: 700; color: #f8fafc;">${data.entity}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #cbd5e1;">Referência:</td>
+              <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 22px; font-weight: 800; color: #fb923c; letter-spacing: 2px;">${formattedRef}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #cbd5e1;">Montante:</td>
+              <td style="padding: 8px 0; text-align: right; font-size: 20px; font-weight: 800; color: #4ade80;">${data.amount} ${data.currency}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #fca5a5; font-size: 12px;">Expira em:</td>
+              <td style="padding: 8px 0; text-align: right; font-size: 13px; color: #fca5a5; font-weight: 700;">${data.expiresAt}</td>
+            </tr>
+          </table>
+        </div>
+
+        <p style="font-size: 13px; color: #475569; text-align: center; margin: 0 0 16px 0;">
+          Abra o seu aplicativo <strong>Multicaixa Express</strong>, vá em <strong>Pagamento por Referência</strong> e confirme os dados acima para garantir sua vaga imediatamente.
+        </p>
+
+        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+          HOT-M — Conteúdo e Produtos Digitais &bull; República de Angola
+        </p>
+      </div>
+    `;
+
+    return { subject, html };
+  }
+
   /**
    * Template: Creator / Affiliate New Sale Notification
    */
