@@ -41,9 +41,19 @@ export async function POST(request: Request) {
     const productService = new ProductService(supabase);
     const requestId = crypto.randomUUID();
 
+    const roles = [...session.roles];
+    if (!roles.includes('CREATOR') && !roles.includes('ADMIN') && !roles.includes('SUPER_ADMIN')) {
+      // Atribui automaticamente a role de CREATOR para qualquer usuário autenticado criar produtos
+      await supabase
+        .from('user_roles')
+        .insert({ user_id: session.id, role_id: 'CREATOR' })
+        .catch(() => {});
+      roles.push('CREATOR');
+    }
+
     const product = await productService.createProduct({
       creatorId: session.id,
-      roles: session.roles,
+      roles,
       input: parsed.data,
       requestId,
     });
