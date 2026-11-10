@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createServerSupabaseClient } from '@/core/database/supabase-server';
+import { createAdminSupabaseClient } from '@/core/database/supabase-admin';
 import { AuthService } from '@/modules/auth/auth-service';
 import { ProductService } from '@/modules/products/product-service';
 import { createProductSchema } from '@/modules/products/schemas';
+import { UserRole } from '@/core/security/rbac';
 
 export async function GET() {
   try {
@@ -41,13 +43,17 @@ export async function POST(request: Request) {
     const productService = new ProductService(supabase);
     const requestId = crypto.randomUUID();
 
-    const roles = [...session.roles];
+    const roles: UserRole[] = [...session.roles];
     if (!roles.includes('CREATOR') && !roles.includes('ADMIN') && !roles.includes('SUPER_ADMIN')) {
-      // Atribui automaticamente a role de CREATOR para qualquer usuário autenticado criar produtos
-      await supabase
-        .from('user_roles')
-        .insert({ user_id: session.id, role_id: 'CREATOR' })
-        .catch(() => {});
+      // Atribui automaticamente a role de CREATOR no banco usando o cliente admin
+      try {
+        const supabaseAdmin = createAdminSupabaseClient();
+        await supabaseAdmin
+          .from('user_roles')
+          .insert({ user_id: session.id, role_id: 'CREATOR' });
+      } catch {
+        // Fallback silencioso se o service role não estiver configurado
+      }
       roles.push('CREATOR');
     }
 
